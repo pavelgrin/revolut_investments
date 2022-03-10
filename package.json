@@ -1,0 +1,33 @@
+{
+    "name": "revolut_investments",
+    "version": "0.1.0",
+    "description": "",
+    "license": "MIT",
+    "author": "Pavel Grinevich",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/pavelgrin/revolut_investments.git"
+    },
+    "main": "dist/main.js",
+    "scripts": {
+        "start": "npm run build && node dist/main.js",
+        "watch": "nodemon src/main.ts",
+        "build": "rm -rf dist && tsc"
+    },
+    "devDependencies": {
+        "@types/node": "^17.0.21",
+        "nodemon": "^2.0.15",
+        "prettier": "2.5.1",
+        "ts-node": "^10.7.0",
+        "typescript": "^4.6.2"
+    },
+    "dependencies": {
+        "dotenv": "^16.0.0"
+    },
+    "prettier": {
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "semi": false,
+        "singleQuote": false
+    }
+}
