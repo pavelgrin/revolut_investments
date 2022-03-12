@@ -11,7 +11,7 @@ const PORT = process.env.APP_PORT || 3000
 const statementPath = path.resolve("public/example.csv")
 const app = express()
 
-app.get("/", async (req, res, next) => {
+app.get("/**", async (req, res) => {
     const statement = await parseStatement(statementPath)
     res.json(statement)
 })
