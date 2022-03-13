@@ -3,17 +3,19 @@ import express from "express"
 import dotenv from "dotenv"
 
 import { parseStatement } from "./parseStatement"
+import { handleStatement } from "./handleStatement"
 
 dotenv.config()
 
 const PORT = process.env.APP_PORT || 3000
 
-const statementPath = path.resolve("public/example.csv")
+const statementPath = path.resolve(process.env.STATEMENT_PATH || "")
 const app = express()
 
 app.get("/**", async (req, res) => {
     const statement = await parseStatement(statementPath)
-    res.json(statement)
+    const report = handleStatement(statement)
+    res.json(report)
 })
 
 app.listen(PORT, () => {

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+-   Overall result calculation
 -   Changelog
 -   Statement parser in CSV format
 -   Initial project

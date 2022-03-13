@@ -4,7 +4,7 @@ import { parse } from "csv-parse"
 import { Transaction } from "./types"
 
 export async function parseStatement(filePath: PathLike) {
-    const promise = () =>
+    const promise = (): Promise<Transaction[]> =>
         new Promise((resolve, reject) => {
             const statement: Transaction[] = []
 
