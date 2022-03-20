@@ -1,109 +1,137 @@
-import { Type, Transaction, Deal, TickerDeals, Tickers } from "./types"
+import { Type, Transaction, GroupedTypes, SellsSummaryRow } from "./types"
+import { getTimestampByDate } from "./utils"
 
-function getBalance(statement: Transaction[]) {
-    return statement.reduce((balance, transaction: Transaction) => {
+function groupByType(statement: Transaction[]) {
+    const groupedTypes: GroupedTypes = {
+        [Type.TopUp]: [],
+        [Type.Withdraw]: [],
+        [Type.Dividend]: [],
+        [Type.Buy]: [],
+        [Type.Sell]: [],
+        [Type.CustodyFee]: [],
+    }
+
+    return statement.reduce((groupedTypes, transaction: Transaction) => {
         const type = transaction[2]
-        const totalAmount = Number(transaction[5])
+        groupedTypes[type].push(transaction)
 
-        if (type === Type.TopUp) {
-            balance += totalAmount
-        } else if (type === Type.Withdraw) {
-            balance -= totalAmount
-        }
+        return groupedTypes
+    }, groupedTypes)
+}
 
-        return balance
+function getTotalAmount(transactions: Transaction[]) {
+    const sum = transactions.reduce((acc, transaction: Transaction) => {
+        const amount = Number(transaction[5])
+        return acc + Math.round(amount * 100)
     }, 0)
+
+    return sum / 100
 }
 
-function groupByTicker(statement: Transaction[]) {
-    return statement.reduce((tickers: Tickers, transaction: Transaction) => {
-        const ticker = transaction[1]
-        const type = transaction[2]
-        const quantity = Number(transaction[3])
-        const pricePerShare = Number(transaction[4])
+function getBalance(deposits: Transaction[], withdrawals: Transaction[]) {
+    const depositAmount = getTotalAmount(deposits)
+    const withdrawalAmount = getTotalAmount(withdrawals)
 
-        if (ticker && quantity && pricePerShare) {
-            if (!tickers[ticker]) {
-                tickers[ticker] = {
-                    [Type.Buy]: [],
-                    [Type.Sell]: [],
-                }
-            }
-
-            if (type === Type.Buy || type === Type.Sell) {
-                tickers[ticker][type].push({
-                    volume: quantity,
-                    price: pricePerShare,
-                })
-            }
-        }
-
-        return tickers
-    }, {})
+    return depositAmount - withdrawalAmount
 }
 
-function copyDeals(deals: Deal[]) {
-    return deals.map(({ volume, price }) => ({ volume, price }))
+function getDividends(dividends: Transaction[]) {
+    return getTotalAmount(dividends)
 }
 
-function calcResult(sellDeals: Deal[], buyDeals: Deal[]) {
-    return sellDeals.reduce((result, { volume, price: sellPrice }) => {
-        let sellVolume = volume
+function getCustodyFee(custodyFees: Transaction[]) {
+    return getTotalAmount(custodyFees)
+}
 
-        buyDeals.forEach((buyDeal) => {
-            if (sellVolume === 0 || buyDeal.volume === 0) {
+function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
+    return sells.map((sellDeal) => {
+        const dateSold = sellDeal[0]
+        const timestampOfSold = getTimestampByDate(dateSold)
+        const symbol = sellDeal[1]
+        const quantity = Number(sellDeal[3])
+        const grossProceeds = Number(sellDeal[5])
+        const sellDealFee = sellDeal[8] ? Number(sellDeal[8]) + 0.01 : 0.01
+
+        let sellDealQuantity = quantity
+        let totalFee = sellDealFee * 100
+        let costBasis = 0
+
+        buys.forEach((buyDeal) => {
+            const buyDealDate = buyDeal[0]
+            const buyDealTimestamp = getTimestampByDate(buyDealDate)
+            const buyDealSymbol = buyDeal[1]
+            const buyDealQuantity = Number(buyDeal[3])
+            const buyDealPrice = Number(buyDeal[4])
+            const buyDealFee = Number(buyDeal[8])
+
+            if (
+                buyDealSymbol !== symbol ||
+                buyDealTimestamp >= timestampOfSold
+            ) {
                 return
             }
 
-            const dealVolume =
-                buyDeal.volume >= sellVolume ? sellVolume : buyDeal.volume
-
-            result += (sellPrice - buyDeal.price) * dealVolume
-
-            if (buyDeal.volume >= sellVolume) {
-                buyDeal.volume -= sellVolume
-                sellVolume = 0
-            } else {
-                sellVolume -= buyDeal.volume
-                buyDeal.volume = 0
+            if (sellDealQuantity === 0 || buyDealQuantity === 0) {
+                return
             }
+
+            const dealQuantity =
+                buyDealQuantity >= sellDealQuantity
+                    ? sellDealQuantity
+                    : buyDealQuantity
+
+            const feeFraction = (dealQuantity / buyDealQuantity) * buyDealFee
+            totalFee += Math.round(feeFraction * 100)
+
+            costBasis += Math.round(
+                Math.round(buyDealPrice * 100) * dealQuantity
+            )
+
+            buyDeal[3] = buyDealQuantity - dealQuantity
+            buyDeal[8] = buyDeal[8] ? buyDeal[8] - feeFraction : null
+            sellDealQuantity -= dealQuantity
         })
 
-        return result
-    }, 0)
-}
+        const pnl = Math.round(grossProceeds * 100 - costBasis - totalFee) / 100
 
-function getTickerProfit(tickerDeals: TickerDeals) {
-    return {
-        FIFO: calcResult(
-            tickerDeals[Type.Sell],
-            copyDeals(tickerDeals[Type.Buy])
-        ),
-        LIFO: calcResult(
-            tickerDeals[Type.Sell],
-            copyDeals(tickerDeals[Type.Buy]).reverse()
-        ),
-    }
+        return {
+            dateSold,
+            symbol,
+            quantity,
+            costBasis: costBasis / 100,
+            grossProceeds,
+            fee: -totalFee / 100,
+            pnl,
+        }
+    })
 }
 
 export function handleStatement(statement: Transaction[]) {
-    const balance = getBalance(statement)
-    const transactionsByTicker = groupByTicker(statement)
+    const transactionByType = groupByType(statement)
 
-    const totalProfit = Object.values(transactionsByTicker)
-        .map((ticker) => getTickerProfit(ticker))
-        .reduce(
-            (profit, { FIFO, LIFO }) => {
-                profit.FIFO += FIFO
-                profit.LIFO += LIFO
+    const balance = getBalance(
+        transactionByType[Type.TopUp],
+        transactionByType[Type.Withdraw]
+    )
 
-                return profit
-            },
-            { FIFO: 0, LIFO: 0 }
-        )
+    const dividends = getDividends(transactionByType[Type.Dividend])
+    const custodyFee = getCustodyFee(transactionByType[Type.CustodyFee])
+
+    const summary = getSellsSummary(
+        transactionByType[Type.Buy],
+        transactionByType[Type.Sell]
+    )
+
+    const totalFIFO =
+        summary.reduce((acc, sellRow) => {
+            return acc + sellRow.pnl * 100
+        }, 0) / 100
 
     return {
         balance,
-        totalProfit,
+        dividends,
+        custodyFee,
+        totalFIFO,
+        summaryFIFO: summary,
     }
 }

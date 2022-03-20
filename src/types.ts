@@ -1,17 +1,20 @@
 export enum Type {
     TopUp = "CASH TOP-UP",
     Withdraw = "CASH WITHDRAW",
+    Dividend = "DIVIDEND",
     Buy = "BUY",
     Sell = "SELL",
+    CustodyFee = "CUSTODY_FEE",
 }
 
 export type Date = string
 export type Ticker = string
 export type Quantity = number
 export type PricePerShare = number
-export type TotalAmount = number
+export type Amount = number
 export type Currency = string
 export type FX_Rate = number
+export type Fee = number
 
 export type Transaction = [
     Date,
@@ -19,19 +22,12 @@ export type Transaction = [
     Type,
     Quantity | null,
     PricePerShare | null,
-    TotalAmount,
+    Amount,
     Currency,
-    FX_Rate
+    FX_Rate,
+    Fee | null
 ]
 
-export type Deal = {
-    volume: Quantity
-    price: PricePerShare
-}
+export type GroupedTypes = Record<Type, Transaction[]>
 
-export type TickerDeals = {
-    [Type.Buy]: Deal[]
-    [Type.Sell]: Deal[]
-}
-
-export type Tickers = Record<Ticker, TickerDeals>
+export type SellsSummaryRow = {}
