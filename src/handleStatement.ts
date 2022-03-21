@@ -17,6 +17,10 @@ function groupByType(statement: Transaction[]) {
     }, groupedTypes)
 }
 
+function copyTransactions(transactions: Transaction[]) {
+    return transactions.map((transaction) => ({ ...transaction }))
+}
+
 function getTotalAmount(transactions: Transaction[]) {
     return transactions.reduce((acc, transaction: Transaction) => {
         return roundAmount(acc + transaction.amount)
@@ -111,21 +115,31 @@ export function handleStatement(statement: Transaction[]) {
     const dividends = getDividends(transactionByType[Type.Dividend])
     const custodyFee = getCustodyFee(transactionByType[Type.CustodyFee])
 
-    const summary = getSellsSummary(
-        transactionByType[Type.Buy].reverse(),
-        transactionByType[Type.Sell]
+    const summaryFIFO = getSellsSummary(
+        copyTransactions(transactionByType[Type.Buy]),
+        copyTransactions(transactionByType[Type.Sell])
     )
 
-    const totalFIFO =
-        summary.reduce((acc, sellRow) => {
-            return acc + sellRow.pnl * 100
-        }, 0) / 100
+    const summaryLIFO = getSellsSummary(
+        copyTransactions(transactionByType[Type.Buy]).reverse(),
+        copyTransactions(transactionByType[Type.Sell])
+    )
+
+    const totalFIFO = summaryFIFO.reduce((acc, sellRow) => {
+        return roundAmount(acc + sellRow.pnl)
+    }, 0)
+
+    const totalLIFO = summaryLIFO.reduce((acc, sellRow) => {
+        return roundAmount(acc + sellRow.pnl)
+    }, 0)
 
     return {
         balance,
         dividends,
         custodyFee,
         totalFIFO,
-        summaryFIFO: summary,
+        totalLIFO,
+        summaryFIFO,
+        summaryLIFO,
     }
 }
