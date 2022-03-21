@@ -1,5 +1,5 @@
-import { Type, Transaction, GroupedTypes, SellsSummaryRow } from "./types"
-import { getTimestampByDate } from "./utils"
+import { Type, Transaction, GroupedTypes } from "./types"
+import { getTimestampByDate, roundAmount } from "./utils"
 
 function groupByType(statement: Transaction[]) {
     const groupedTypes: GroupedTypes = {
@@ -12,27 +12,22 @@ function groupByType(statement: Transaction[]) {
     }
 
     return statement.reduce((groupedTypes, transaction: Transaction) => {
-        const type = transaction[2]
-        groupedTypes[type].push(transaction)
-
+        groupedTypes[transaction.type].push(transaction)
         return groupedTypes
     }, groupedTypes)
 }
 
 function getTotalAmount(transactions: Transaction[]) {
-    const sum = transactions.reduce((acc, transaction: Transaction) => {
-        const amount = Number(transaction[5])
-        return acc + Math.round(amount * 100)
+    return transactions.reduce((acc, transaction: Transaction) => {
+        return roundAmount(acc + transaction.amount)
     }, 0)
-
-    return sum / 100
 }
 
 function getBalance(deposits: Transaction[], withdrawals: Transaction[]) {
     const depositAmount = getTotalAmount(deposits)
     const withdrawalAmount = getTotalAmount(withdrawals)
 
-    return depositAmount - withdrawalAmount
+    return roundAmount(depositAmount - withdrawalAmount)
 }
 
 function getDividends(dividends: Transaction[]) {
@@ -45,33 +40,34 @@ function getCustodyFee(custodyFees: Transaction[]) {
 
 function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
     return sells.map((sellDeal) => {
-        const dateSold = sellDeal[0]
-        const timestampOfSold = getTimestampByDate(dateSold)
-        const symbol = sellDeal[1]
-        const quantity = Number(sellDeal[3])
-        const grossProceeds = Number(sellDeal[5])
-        const sellDealFee = sellDeal[8] ? Number(sellDeal[8]) + 0.01 : 0.01
+        const date = sellDeal.date
+        const sellDealTimestamp = getTimestampByDate(date)
+        const symbol = sellDeal.ticker
+        const quantity = sellDeal.quantity
+        const grossProceeds = sellDeal.amount
+        const sellDealFee = sellDeal.fee || 0.01
 
         let sellDealQuantity = quantity
-        let totalFee = sellDealFee * 100
+        let totalFee = sellDealFee
         let costBasis = 0
 
         buys.forEach((buyDeal) => {
-            const buyDealDate = buyDeal[0]
+            const buyDealDate = buyDeal.date
             const buyDealTimestamp = getTimestampByDate(buyDealDate)
-            const buyDealSymbol = buyDeal[1]
-            const buyDealQuantity = Number(buyDeal[3])
-            const buyDealPrice = Number(buyDeal[4])
-            const buyDealFee = Number(buyDeal[8])
+            const buyDealSymbol = buyDeal.ticker
+            const buyDealQuantity = buyDeal.quantity
+            const buyDealPrice = buyDeal.pricePerShare
+            const buyDealFee = buyDeal.fee || 0
 
             if (
                 buyDealSymbol !== symbol ||
-                buyDealTimestamp >= timestampOfSold
+                buyDealTimestamp >= sellDealTimestamp ||
+                sellDealQuantity === 0 ||
+                buyDealQuantity === 0 ||
+                !buyDealQuantity ||
+                !sellDealQuantity ||
+                !buyDealPrice
             ) {
-                return
-            }
-
-            if (sellDealQuantity === 0 || buyDealQuantity === 0) {
                 return
             }
 
@@ -81,26 +77,24 @@ function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
                     : buyDealQuantity
 
             const feeFraction = (dealQuantity / buyDealQuantity) * buyDealFee
-            totalFee += Math.round(feeFraction * 100)
+            totalFee = roundAmount(totalFee + feeFraction)
 
-            costBasis += Math.round(
-                Math.round(buyDealPrice * 100) * dealQuantity
-            )
+            costBasis = roundAmount(costBasis + buyDealPrice * dealQuantity)
 
-            buyDeal[3] = buyDealQuantity - dealQuantity
-            buyDeal[8] = buyDeal[8] ? buyDeal[8] - feeFraction : null
+            buyDeal.quantity = buyDealQuantity - dealQuantity
+            buyDeal.fee = buyDeal.fee ? buyDeal.fee - feeFraction : 0
             sellDealQuantity -= dealQuantity
         })
 
-        const pnl = Math.round(grossProceeds * 100 - costBasis - totalFee) / 100
+        const pnl = roundAmount(grossProceeds - costBasis - totalFee)
 
         return {
-            dateSold,
+            date,
             symbol,
             quantity,
-            costBasis: costBasis / 100,
+            costBasis,
             grossProceeds,
-            fee: -totalFee / 100,
+            fee: totalFee,
             pnl,
         }
     })
@@ -118,7 +112,7 @@ export function handleStatement(statement: Transaction[]) {
     const custodyFee = getCustodyFee(transactionByType[Type.CustodyFee])
 
     const summary = getSellsSummary(
-        transactionByType[Type.Buy],
+        transactionByType[Type.Buy].reverse(),
         transactionByType[Type.Sell]
     )
 

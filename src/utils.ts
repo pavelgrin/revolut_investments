@@ -4,3 +4,7 @@ export function getTimestampByDate(dateTime: string) {
 
     return Number(new Date(`${YYYY}-${MM}-${DD} ${time}`))
 }
+
+export function roundAmount(number: number) {
+    return Math.round(number * 100) / 100
+}

@@ -10,8 +10,20 @@ export async function parseStatement(filePath: PathLike) {
 
             createReadStream(filePath)
                 .pipe(parse({ delimiter: ",", from_line: 2 }))
-                .on("data", (csvRow: Transaction) => {
-                    statement.push(csvRow)
+                .on("data", (csvRow) => {
+                    const transaction: Transaction = {
+                        date: csvRow[0],
+                        ticker: csvRow[1] || null,
+                        type: csvRow[2],
+                        quantity: csvRow[3] ? Number(csvRow[3]) : null,
+                        pricePerShare: csvRow[4] ? Number(csvRow[4]) : null,
+                        amount: Number(csvRow[5]),
+                        currency: csvRow[6],
+                        fxRate: Number(csvRow[7]),
+                        fee: csvRow[8] ? Number(csvRow[8]) : null,
+                    }
+
+                    statement.push(transaction)
                 })
                 .on("end", () => {
                     resolve(statement)
