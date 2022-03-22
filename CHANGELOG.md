@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.0] - 2022-03-22
+
 ### Added
 
 -   Filter summary by range
@@ -26,5 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Statement parser in CSV format
 -   Initial project
 
-[unreleased]: https://github.com/pavelgrin/revolut_investments/compare/v0.1.0...HEAD
-[v0.1.0]: https://github.com/pavelgrin/revolut_investments/compare/126fd9f1732a9984203cf648a4f3c87d96d466dc...HEAD
+[unreleased]: https://github.com/pavelgrin/revolut_investments/compare/v0.4.0...HEAD
+[v0.4.0]: https://github.com/pavelgrin/revolut_investments/compare/v0.1.0...v0.4.0
+[v0.1.0]: https://github.com/pavelgrin/revolut_investments/releases/v0.1.0
