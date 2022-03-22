@@ -1,5 +1,17 @@
-import { Type, Transaction, GroupedTypes } from "./types"
+import { Type, Transaction, GroupedTypes, RequestRange } from "./types"
 import { getTimestampByDate, roundAmount } from "./utils"
+
+function filterStatement(statement: Transaction[], { from, to }: RequestRange) {
+    const fromTimestamp = from && getTimestampByDate(from)
+    const toTimestamp = to && getTimestampByDate(to)
+
+    return statement.filter(({ timestamp, type }) => {
+        const isFrom = fromTimestamp ? timestamp >= fromTimestamp : true
+        const isTo = toTimestamp ? timestamp <= toTimestamp : true
+
+        return type === Type.Buy || (isFrom && isTo)
+    })
+}
 
 function groupByType(statement: Transaction[]) {
     const groupedTypes: GroupedTypes = {
@@ -45,7 +57,7 @@ function getCustodyFee(custodyFees: Transaction[]) {
 function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
     return sells.map((sellDeal) => {
         const date = sellDeal.date
-        const sellDealTimestamp = getTimestampByDate(date)
+        const sellDealTimestamp = sellDeal.timestamp
         const symbol = sellDeal.ticker
         const quantity = sellDeal.quantity
         const grossProceeds = sellDeal.amount
@@ -56,8 +68,7 @@ function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
         let costBasis = 0
 
         buys.forEach((buyDeal) => {
-            const buyDealDate = buyDeal.date
-            const buyDealTimestamp = getTimestampByDate(buyDealDate)
+            const buyDealTimestamp = buyDeal.timestamp
             const buyDealSymbol = buyDeal.ticker
             const buyDealQuantity = buyDeal.quantity
             const buyDealPrice = buyDeal.pricePerShare
@@ -104,8 +115,9 @@ function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
     })
 }
 
-export function handleStatement(statement: Transaction[]) {
-    const transactionByType = groupByType(statement)
+export function handleStatement(statement: Transaction[], range: RequestRange) {
+    const filteredTransactions = filterStatement(statement, range)
+    const transactionByType = groupByType(filteredTransactions)
 
     const balance = getBalance(
         transactionByType[Type.TopUp],

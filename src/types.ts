@@ -8,6 +8,7 @@ export enum Type {
 }
 
 export type Date = string
+export type Timestamp = number
 export type Ticker = string
 export type Quantity = number
 export type PricePerShare = number
@@ -18,6 +19,7 @@ export type Fee = number
 
 export type Transaction = {
     date: Date
+    timestamp: Timestamp
     ticker: Ticker | null
     type: Type
     quantity: Quantity | null
@@ -29,3 +31,8 @@ export type Transaction = {
 }
 
 export type GroupedTypes = Record<Type, Transaction[]>
+
+export type RequestRange = {
+    from: string
+    to: string
+}

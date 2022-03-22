@@ -9,10 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
--   Sells summary (FIFO)
+-   Filter summary by range
 -   Sells summary (LIFO)
+-   Sells summary (FIFO)
 
-### Fixed
+### Changed
 
 -   Transaction type
 
