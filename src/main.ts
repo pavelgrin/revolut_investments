@@ -2,7 +2,7 @@ import path from "path"
 import express from "express"
 import dotenv from "dotenv"
 
-import { RequestRange } from "./types"
+import { RequestFilter } from "./types"
 import { parseStatement } from "./parseStatement"
 import { handleStatement } from "./handleStatement"
 
@@ -14,10 +14,10 @@ const statementPath = path.resolve(process.env.STATEMENT_PATH || "")
 const app = express()
 
 app.get("/**", async (req, res) => {
-    const { from, to } = req.query as RequestRange
+    const { from, to, symbol } = req.query as RequestFilter
 
     const statement = await parseStatement(statementPath)
-    const report = handleStatement(statement, { from, to })
+    const report = handleStatement(statement, { from, to, symbol })
     res.json(report)
 })
 

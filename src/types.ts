@@ -32,7 +32,8 @@ export type Transaction = {
 
 export type GroupedTypes = Record<Type, Transaction[]>
 
-export type RequestRange = {
+export type RequestFilter = {
     from: string
     to: string
+    symbol: string
 }

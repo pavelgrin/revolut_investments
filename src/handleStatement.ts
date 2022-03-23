@@ -1,15 +1,19 @@
-import { Type, Transaction, GroupedTypes, RequestRange } from "./types"
+import { Type, Transaction, GroupedTypes, RequestFilter } from "./types"
 import { getTimestampByDate, roundAmount } from "./utils"
 
-function filterStatement(statement: Transaction[], { from, to }: RequestRange) {
+function filterStatement(
+    statement: Transaction[],
+    { from, to, symbol }: RequestFilter
+) {
     const fromTimestamp = from && getTimestampByDate(from)
     const toTimestamp = to && getTimestampByDate(to)
 
-    return statement.filter(({ timestamp, type }) => {
+    return statement.filter(({ timestamp, type, ticker }) => {
         const isFrom = fromTimestamp ? timestamp >= fromTimestamp : true
         const isTo = toTimestamp ? timestamp <= toTimestamp : true
+        const isSymbol = symbol ? symbol === ticker : true
 
-        return type === Type.Buy || (isFrom && isTo)
+        return type === Type.Buy || (isFrom && isTo && isSymbol)
     })
 }
 
@@ -115,8 +119,11 @@ function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
     })
 }
 
-export function handleStatement(statement: Transaction[], range: RequestRange) {
-    const filteredTransactions = filterStatement(statement, range)
+export function handleStatement(
+    statement: Transaction[],
+    filter: RequestFilter
+) {
+    const filteredTransactions = filterStatement(statement, filter)
     const transactionByType = groupByType(filteredTransactions)
 
     const balance = getBalance(
