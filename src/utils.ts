@@ -1,10 +1,14 @@
-export function getTimestampByDate(dateTime: string) {
+export function getISODate(dateTime: string) {
     const [date, time] = dateTime.split(" ")
     const [DD, MM, YYYY] = date.split("/")
 
     const isoDate = `${YYYY}-${MM}-${DD}`
 
-    return Number(new Date(time ? `${isoDate} ${time}` : isoDate))
+    return time ? `${isoDate} ${time}` : isoDate
+}
+
+export function getTimestampByDate(dateTime: string) {
+    return Number(new Date(getISODate(dateTime)))
 }
 
 export function roundAmount(number: number) {

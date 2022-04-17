@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+-   Summary in euro (via filter)
 -   Filter summary by ticker
 
 ## [v0.4.0] - 2022-03-22

@@ -7,13 +7,17 @@ export enum Type {
     CustodyFee = "CUSTODY_FEE",
 }
 
+export enum Currency {
+    USD = "USD",
+    EUR = "EUR",
+}
+
 export type Date = string
 export type Timestamp = number
 export type Ticker = string
 export type Quantity = number
-export type PricePerShare = number
+export type Price = number
 export type Amount = number
-export type Currency = string
 export type FX_Rate = number
 export type Fee = number
 
@@ -23,7 +27,7 @@ export type Transaction = {
     ticker: Ticker | null
     type: Type
     quantity: Quantity | null
-    pricePerShare: PricePerShare | null
+    pricePerShare: Price | null
     amount: Amount
     currency: Currency
     fxRate: FX_Rate
@@ -32,8 +36,19 @@ export type Transaction = {
 
 export type GroupedTypes = Record<Type, Transaction[]>
 
+export type SummaryItem = {
+    date: Date
+    symbol: Ticker
+    quantity: Quantity
+    costBasis: Amount
+    grossProceeds: Amount
+    fee: Fee
+    pnl: Amount
+}
+
 export type RequestFilter = {
     from: string
     to: string
     symbol: string
+    currency: Currency
 }

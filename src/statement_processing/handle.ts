@@ -1,41 +1,15 @@
-import { Type, Transaction, GroupedTypes, RequestFilter } from "./types"
-import { getTimestampByDate, roundAmount } from "./utils"
+import {
+    Type,
+    Transaction,
+    SummaryItem,
+    RequestFilter,
+    Currency,
+} from "../types"
+import { roundAmount } from "../utils"
 
-function filterStatement(
-    statement: Transaction[],
-    { from, to, symbol }: RequestFilter
-) {
-    const fromTimestamp = from && getTimestampByDate(from)
-    const toTimestamp = to && getTimestampByDate(to)
+import { applyFilter, groupByType, copyTransactions } from "./prepare_data"
 
-    return statement.filter(({ timestamp, type, ticker }) => {
-        const isFrom = fromTimestamp ? timestamp >= fromTimestamp : true
-        const isTo = toTimestamp ? timestamp <= toTimestamp : true
-        const isSymbol = symbol ? symbol === ticker : true
-
-        return type === Type.Buy || (isFrom && isTo && isSymbol)
-    })
-}
-
-function groupByType(statement: Transaction[]) {
-    const groupedTypes: GroupedTypes = {
-        [Type.TopUp]: [],
-        [Type.Withdraw]: [],
-        [Type.Dividend]: [],
-        [Type.Buy]: [],
-        [Type.Sell]: [],
-        [Type.CustodyFee]: [],
-    }
-
-    return statement.reduce((groupedTypes, transaction: Transaction) => {
-        groupedTypes[transaction.type].push(transaction)
-        return groupedTypes
-    }, groupedTypes)
-}
-
-function copyTransactions(transactions: Transaction[]) {
-    return transactions.map((transaction) => ({ ...transaction }))
-}
+const DIVIDEND_TAX_RATE = 0.15
 
 function getTotalAmount(transactions: Transaction[]) {
     return transactions.reduce((acc, transaction: Transaction) => {
@@ -51,7 +25,25 @@ function getBalance(deposits: Transaction[], withdrawals: Transaction[]) {
 }
 
 function getDividends(dividends: Transaction[]) {
-    return getTotalAmount(dividends)
+    return dividends.reduce(
+        (acc, { amount }: Transaction) => {
+            const taxes = roundAmount(amount * DIVIDEND_TAX_RATE)
+            const withTaxes = roundAmount(amount + taxes)
+
+            acc = {
+                amount: roundAmount(acc.amount + amount),
+                withTaxes: roundAmount(acc.withTaxes + withTaxes),
+                taxes: roundAmount(acc.taxes + taxes),
+            }
+
+            return acc
+        },
+        {
+            amount: 0,
+            withTaxes: 0,
+            taxes: 0,
+        }
+    )
 }
 
 function getCustodyFee(custodyFees: Transaction[]) {
@@ -115,7 +107,7 @@ function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
             grossProceeds,
             fee: totalFee,
             pnl,
-        }
+        } as SummaryItem
     })
 }
 
@@ -123,7 +115,9 @@ export function handleStatement(
     statement: Transaction[],
     filter: RequestFilter
 ) {
-    const filteredTransactions = filterStatement(statement, filter)
+    const currency = filter.currency || Currency.USD
+
+    const filteredTransactions = applyFilter(statement, filter)
     const transactionByType = groupByType(filteredTransactions)
 
     const balance = getBalance(
@@ -134,12 +128,12 @@ export function handleStatement(
     const dividends = getDividends(transactionByType[Type.Dividend])
     const custodyFee = getCustodyFee(transactionByType[Type.CustodyFee])
 
-    const summaryFIFO = getSellsSummary(
+    const summaryFIFO: SummaryItem[] = getSellsSummary(
         copyTransactions(transactionByType[Type.Buy]),
         copyTransactions(transactionByType[Type.Sell])
     )
 
-    const summaryLIFO = getSellsSummary(
+    const summaryLIFO: SummaryItem[] = getSellsSummary(
         copyTransactions(transactionByType[Type.Buy]).reverse(),
         copyTransactions(transactionByType[Type.Sell])
     )
@@ -153,6 +147,7 @@ export function handleStatement(
     }, 0)
 
     return {
+        currency,
         balance,
         dividends,
         custodyFee,
