@@ -27,21 +27,21 @@ function getBalance(deposits: Transaction[], withdrawals: Transaction[]) {
 function getDividends(dividends: Transaction[]) {
     return dividends.reduce(
         (acc, { amount }: Transaction) => {
-            const taxes = roundAmount(amount * DIVIDEND_TAX_RATE)
-            const withTaxes = roundAmount(amount + taxes)
+            const withTax = roundAmount(amount / (1 - DIVIDEND_TAX_RATE))
+            const tax = roundAmount(withTax - amount)
 
             acc = {
                 amount: roundAmount(acc.amount + amount),
-                withTaxes: roundAmount(acc.withTaxes + withTaxes),
-                taxes: roundAmount(acc.taxes + taxes),
+                withTax: roundAmount(acc.withTax + withTax),
+                tax: roundAmount(acc.tax + tax),
             }
 
             return acc
         },
         {
             amount: 0,
-            withTaxes: 0,
-            taxes: 0,
+            withTax: 0,
+            tax: 0,
         }
     )
 }
