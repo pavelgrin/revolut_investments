@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.7.0] - 2022-04-18
+
 ### Added
 
 -   Ticker summary
@@ -38,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Statement parser in CSV format
 -   Initial project
 
-[unreleased]: https://github.com/pavelgrin/revolut_investments/compare/v0.4.0...HEAD
+[unreleased]: https://github.com/pavelgrin/revolut_investments/compare/v0.7.0...HEAD
+[v0.7.0]: https://github.com/pavelgrin/revolut_investments/compare/v0.4.0...v0.7.0
 [v0.4.0]: https://github.com/pavelgrin/revolut_investments/compare/v0.1.0...v0.4.0
 [v0.1.0]: https://github.com/pavelgrin/revolut_investments/releases/v0.1.0
