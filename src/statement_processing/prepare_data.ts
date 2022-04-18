@@ -16,11 +16,17 @@ export function applyFilter(
 
     return statement
         .filter(({ timestamp, type, ticker }) => {
-            const isFrom = fromTimestamp ? timestamp >= fromTimestamp : true
-            const isTo = toTimestamp ? timestamp <= toTimestamp : true
+            const isFrom = fromTimestamp
+                ? timestamp >= fromTimestamp || type === Type.Buy
+                : true
+
+            const isTo = toTimestamp
+                ? timestamp <= toTimestamp || type === Type.Buy
+                : true
+
             const isSymbol = symbol ? symbol === ticker : true
 
-            return type === Type.Buy || (isFrom && isTo && isSymbol)
+            return isFrom && isTo && isSymbol
         })
         .map((transaction: Transaction) => {
             if (currency === Currency.EUR) {
@@ -55,6 +61,18 @@ export function groupByType(statement: Transaction[]) {
         groupedTypes[transaction.type].push(transaction)
         return groupedTypes
     }, groupedTypes)
+}
+
+export function getTotalAmount(transactions: Transaction[]) {
+    return transactions.reduce((acc, transaction: Transaction) => {
+        return roundAmount(acc + transaction.amount)
+    }, 0)
+}
+
+export function getTotalQuantity(transactions: Transaction[]) {
+    return transactions.reduce((acc, transaction: Transaction) => {
+        return acc + (transaction.quantity || 0)
+    }, 0)
 }
 
 export function copyTransactions(transactions: Transaction[]) {

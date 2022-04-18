@@ -47,8 +47,8 @@ export type SummaryItem = {
 }
 
 export type RequestFilter = {
-    from: string
-    to: string
-    symbol: string
-    currency: Currency
+    from: string | null
+    to: string | null
+    symbol: string | null
+    currency: Currency | null
 }
