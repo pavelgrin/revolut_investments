@@ -8,7 +8,7 @@ export function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
         const symbol = sellDeal.ticker
         const quantity = sellDeal.quantity
         const grossProceeds = sellDeal.amount
-        const sellDealFee = sellDeal.fee || 0.01
+        const sellDealFee = sellDeal.fee || 0
 
         let sellDealQuantity = quantity
         let totalFee = sellDealFee

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+-   Fix deal types
+-   Fix date parsing
+-   Fix fee handling
+
 ## [v0.7.0] - 2022-04-18
 
 ### Added

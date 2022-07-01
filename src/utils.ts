@@ -1,10 +1,6 @@
 export function getISODate(dateTime: string) {
-    const [date, time] = dateTime.split(" ")
-    const [DD, MM, YYYY] = date.split("/")
-
-    const isoDate = `${YYYY}-${MM}-${DD}`
-
-    return time ? `${isoDate} ${time}` : isoDate
+    const [date, time] = dateTime.split("T")
+    return `${date} ${time}`
 }
 
 export function getTimestampByDate(dateTime: string) {
@@ -13,4 +9,8 @@ export function getTimestampByDate(dateTime: string) {
 
 export function roundAmount(number: number) {
     return Math.round(number * 100) / 100
+}
+
+export function parseNumber(value: string) {
+    return parseFloat(value.replace(/[^0-9.-]+/g, ""))
 }

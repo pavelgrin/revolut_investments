@@ -6,15 +6,25 @@ import {
     SummaryItem,
     RequestFilter,
     GroupedTypes,
+    // GroupedTickers,
 } from "../types"
 import { roundAmount } from "../utils"
 
-import { applyFilter, groupByType, copyTransactions } from "./prepare_data"
+import {
+    applyFilter,
+    groupByType,
+    groupByTicker,
+    copyTransactions,
+} from "./prepare_data"
 import { getBalance, getDividends, getCustodyFee } from "./calc_total"
 import { getSellsSummary } from "./calc_sells_summary"
 import { getTickerSummary } from "./calc_ticker_summary"
 
-function getCommonReport(transactionByType: GroupedTypes, currency: Currency) {
+function getCommonReport(
+    transactionByType: GroupedTypes,
+    activeTickers: [string, number][],
+    currency: Currency
+) {
     const balance = getBalance(
         transactionByType[Type.TopUp],
         transactionByType[Type.Withdraw]
@@ -43,6 +53,7 @@ function getCommonReport(transactionByType: GroupedTypes, currency: Currency) {
 
     return {
         currency,
+        activeTickers,
         balance,
         dividends,
         custodyFee,
@@ -88,12 +99,19 @@ export function handleStatement(
 ) {
     const filteredTransactions = applyFilter(statement, filter)
     const transactionByType = groupByType(filteredTransactions)
+    const transactionByTicker = groupByTicker(filteredTransactions)
 
     const currency = filter.currency || Currency.USD
+
+    const activeTickers = Object.entries(transactionByTicker).filter(
+        ([_, quantity]) => {
+            return Boolean(quantity)
+        }
+    )
 
     if (filter.symbol) {
         return getTickerReport(transactionByType, currency, filter.symbol)
     }
 
-    return getCommonReport(transactionByType, currency)
+    return getCommonReport(transactionByType, activeTickers, currency)
 }

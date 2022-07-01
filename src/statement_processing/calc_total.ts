@@ -12,7 +12,7 @@ export function getBalance(
     const depositAmount = getTotalAmount(deposits)
     const withdrawalAmount = getTotalAmount(withdrawals)
 
-    return roundAmount(depositAmount - withdrawalAmount)
+    return roundAmount(depositAmount + withdrawalAmount)
 }
 
 export function getDividends(dividends: Transaction[]) {

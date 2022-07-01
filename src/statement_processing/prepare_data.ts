@@ -3,6 +3,7 @@ import {
     Currency,
     Transaction,
     GroupedTypes,
+    GroupedTickers,
     RequestFilter,
 } from "../types"
 import { roundAmount, getTimestampByDate } from "../utils"
@@ -55,12 +56,36 @@ export function groupByType(statement: Transaction[]) {
         [Type.Buy]: [],
         [Type.Sell]: [],
         [Type.CustodyFee]: [],
+        [Type.Unknown]: [],
     }
 
     return statement.reduce((groupedTypes, transaction: Transaction) => {
+        if (!groupedTypes[transaction.type]) {
+            console.log(transaction.type)
+        }
         groupedTypes[transaction.type].push(transaction)
         return groupedTypes
     }, groupedTypes)
+}
+
+export function groupByTicker(statement: Transaction[]) {
+    const groupedTickers: GroupedTickers = {}
+
+    return statement.reduce((groupedTickers, transaction: Transaction) => {
+        if (transaction.ticker) {
+            if (!groupedTickers[transaction.ticker]) {
+                groupedTickers[transaction.ticker] = 0
+            }
+
+            if (transaction.type === Type.Buy) {
+                groupedTickers[transaction.ticker] += transaction.quantity || 0
+            } else if (transaction.type === Type.Sell) {
+                groupedTickers[transaction.ticker] -= transaction.quantity || 0
+            }
+        }
+
+        return groupedTickers
+    }, groupedTickers)
 }
 
 export function getTotalAmount(transactions: Transaction[]) {

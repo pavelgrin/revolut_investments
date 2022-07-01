@@ -1,10 +1,11 @@
 export enum Type {
     TopUp = "CASH TOP-UP",
-    Withdraw = "CASH WITHDRAW",
+    Withdraw = "CASH WITHDRAWAL",
     Dividend = "DIVIDEND",
-    Buy = "BUY",
-    Sell = "SELL",
-    CustodyFee = "CUSTODY_FEE",
+    Buy = "BUY - MARKET",
+    Sell = "SELL - MARKET",
+    CustodyFee = "CUSTODY FEE",
+    Unknown = "STOCK SPLIT",
 }
 
 export enum Currency {
@@ -35,6 +36,7 @@ export type Transaction = {
 }
 
 export type GroupedTypes = Record<Type, Transaction[]>
+export type GroupedTickers = Record<Ticker, Quantity>
 
 export type SummaryItem = {
     date: Date
