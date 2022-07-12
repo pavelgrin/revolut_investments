@@ -5,7 +5,8 @@ export enum Type {
     Buy = "BUY - MARKET",
     Sell = "SELL - MARKET",
     CustodyFee = "CUSTODY FEE",
-    Unknown = "STOCK SPLIT",
+    StockSplit = "STOCK SPLIT",
+    Unknown = "",
 }
 
 export enum Currency {

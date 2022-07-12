@@ -56,12 +56,13 @@ export function groupByType(statement: Transaction[]) {
         [Type.Buy]: [],
         [Type.Sell]: [],
         [Type.CustodyFee]: [],
+        [Type.StockSplit]: [],
         [Type.Unknown]: [],
     }
 
     return statement.reduce((groupedTypes, transaction: Transaction) => {
         if (!groupedTypes[transaction.type]) {
-            console.log(transaction.type)
+            console.warn(transaction.type)
         }
         groupedTypes[transaction.type].push(transaction)
         return groupedTypes
@@ -102,4 +103,65 @@ export function getTotalQuantity(transactions: Transaction[]) {
 
 export function copyTransactions(transactions: Transaction[]) {
     return transactions.map((transaction) => ({ ...transaction }))
+}
+
+export function handleStockSplit(transactionByType: GroupedTypes) {
+    transactionByType[Type.StockSplit].forEach((splitTransaction) => {
+        const splitQuantity = splitTransaction.quantity || 0
+
+        const buyDeals = transactionByType[Type.Buy].filter(
+            (transaction) =>
+                transaction.ticker === splitTransaction.ticker &&
+                transaction.timestamp < splitTransaction.timestamp
+        )
+
+        const sellDeals = transactionByType[Type.Sell].filter(
+            (transaction) =>
+                transaction.ticker === splitTransaction.ticker &&
+                transaction.timestamp < splitTransaction.timestamp
+        )
+
+        const buyQuantitySum = buyDeals.reduce(
+            (acc, { quantity }) => acc + (quantity || 0),
+            0
+        )
+
+        const sellQuantitySum = sellDeals.reduce(
+            (acc, { quantity }) => acc + (quantity || 0),
+            0
+        )
+
+        const quantitySum = buyQuantitySum - sellQuantitySum
+        // const splitRatio = Math.round(
+        //     (splitQuantity + quantitySum) / quantitySum
+        // )
+
+        // Mutate buy deals to update quantity and price after split
+        buyDeals.forEach((transaction) => {
+            if (!transaction.quantity) {
+                return
+            }
+
+            const quantityRatio = transaction.quantity / quantitySum
+
+            transaction.quantity += quantityRatio * splitQuantity
+            transaction.pricePerShare =
+                transaction.amount / transaction.quantity
+        })
+
+        // Mutate sell deals to update quantity and price after split
+        sellDeals.forEach((transaction) => {
+            if (!transaction.quantity) {
+                return
+            }
+
+            const quantityRatio = transaction.quantity / quantitySum
+
+            transaction.quantity += quantityRatio * splitQuantity
+            transaction.pricePerShare =
+                transaction.amount / transaction.quantity
+        })
+    })
+
+    return transactionByType
 }
