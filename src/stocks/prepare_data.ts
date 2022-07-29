@@ -5,7 +5,7 @@ import {
     GroupedTypes,
     GroupedTickers,
     RequestFilter,
-} from "../types"
+} from "./types"
 import { roundAmount, getTimestampByDate } from "../utils"
 
 export function applyFilter(
@@ -31,7 +31,7 @@ export function applyFilter(
         })
         .map((transaction: Transaction) => {
             if (currency === Currency.EUR) {
-                const { pricePerShare, amount, fxRate, fee } = transaction
+                const { pricePerShare, amount, fxRate } = transaction
 
                 return {
                     ...transaction,
@@ -40,7 +40,6 @@ export function applyFilter(
                         ? roundAmount(pricePerShare / fxRate)
                         : null,
                     amount: roundAmount(amount / fxRate),
-                    fee: fee ? roundAmount(fee / fxRate) : null,
                 }
             }
 

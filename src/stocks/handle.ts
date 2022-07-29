@@ -7,7 +7,7 @@ import {
     RequestFilter,
     GroupedTypes,
     // GroupedTickers,
-} from "../types"
+} from "./types"
 import { roundAmount } from "../utils"
 
 import {

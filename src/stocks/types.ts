@@ -21,7 +21,6 @@ export type Quantity = number
 export type Price = number
 export type Amount = number
 export type FX_Rate = number
-export type Fee = number
 
 export type Transaction = {
     date: Date
@@ -33,7 +32,6 @@ export type Transaction = {
     amount: Amount
     currency: Currency
     fxRate: FX_Rate
-    fee: Fee | null
 }
 
 export type GroupedTypes = Record<Type, Transaction[]>
@@ -45,7 +43,6 @@ export type SummaryItem = {
     quantity: Quantity
     costBasis: Amount
     grossProceeds: Amount
-    fee: Fee
     pnl: Amount
 }
 

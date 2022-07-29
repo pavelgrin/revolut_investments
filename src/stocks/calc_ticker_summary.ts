@@ -1,4 +1,4 @@
-import { Transaction } from "../types"
+import { Transaction } from "./types"
 import { roundAmount } from "../utils"
 
 import { getTotalAmount, getTotalQuantity } from "./prepare_data"

@@ -1,4 +1,4 @@
-import { Transaction, SummaryItem } from "../types"
+import { Transaction, SummaryItem } from "./types"
 import { roundAmount } from "../utils"
 
 export function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
@@ -8,10 +8,8 @@ export function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
         const symbol = sellDeal.ticker
         const quantity = sellDeal.quantity
         const grossProceeds = sellDeal.amount
-        const sellDealFee = sellDeal.fee || 0
 
         let sellDealQuantity = quantity
-        let totalFee = sellDealFee
         let costBasis = 0
 
         buys.forEach((buyDeal) => {
@@ -19,7 +17,6 @@ export function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
             const buyDealSymbol = buyDeal.ticker
             const buyDealQuantity = buyDeal.quantity
             const buyDealPrice = buyDeal.pricePerShare
-            const buyDealFee = buyDeal.fee || 0
 
             if (
                 buyDealSymbol !== symbol ||
@@ -38,17 +35,13 @@ export function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
                     ? sellDealQuantity
                     : buyDealQuantity
 
-            const feeFraction = (dealQuantity / buyDealQuantity) * buyDealFee
-            totalFee = roundAmount(totalFee + feeFraction)
-
             costBasis = roundAmount(costBasis + buyDealPrice * dealQuantity)
 
             buyDeal.quantity = buyDealQuantity - dealQuantity
-            buyDeal.fee = buyDeal.fee ? buyDeal.fee - feeFraction : 0
             sellDealQuantity -= dealQuantity
         })
 
-        const pnl = roundAmount(grossProceeds - costBasis - totalFee)
+        const pnl = roundAmount(grossProceeds - costBasis)
 
         return {
             date,
@@ -56,7 +49,6 @@ export function getSellsSummary(buys: Transaction[], sells: Transaction[]) {
             quantity,
             costBasis,
             grossProceeds,
-            fee: totalFee,
             pnl,
         } as SummaryItem
     })
