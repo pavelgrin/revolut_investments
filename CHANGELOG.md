@@ -10,13 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 -   Stock split calculation
+-   Dockerfile
 
 ### Fixed
 
--   Fix deal types
--   Fix date parsing
--   Fix fee handling
--   Fix fee calculation
+-   Deal types
+-   Date parsing
+-   Fee handling
+-   Fee calculation
 
 ## [v0.7.0] - 2022-04-18
 
