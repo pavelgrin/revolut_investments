@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+    web:
+        build:
+            context: .
+            args:
+                WORK_DIR: ${WORK_DIR}
+        ports:
+            - "${APP_PORT}:${APP_PORT}"
+        volumes:
+            - .:${WORK_DIR}:ro
+            - ./resources:${WORK_DIR}/resources:rw

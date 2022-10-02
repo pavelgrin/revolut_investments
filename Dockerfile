@@ -1,5 +1,8 @@
-FROM node:18-alpine
-WORKDIR /app
+FROM node:18
+RUN apt update && apt install -y apt-transport-https ca-certificates sqlite3
+ARG WORK_DIR
+WORKDIR ${WORK_DIR}
 COPY . .
 RUN npm install && npm run build
-CMD ["node", "dist/main.js"]
+# CMD ["node", "build/main.js"]
+CMD ["npm", "run", "watch"]

@@ -8,9 +8,11 @@ import { handleStatement } from "./stocks/handle"
 
 dotenv.config()
 
-const PORT = process.env.APP_PORT || 3000
+const { APP_PORT, STATEMENT_PATH } = process.env
 
-const statementPath = path.resolve(process.env.STATEMENT_PATH || "")
+const PORT = APP_PORT || 3000
+
+const statementPath = path.resolve(STATEMENT_PATH || "")
 const app = express()
 
 app.get("/stocks", async (req, res) => {
