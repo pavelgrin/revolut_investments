@@ -2,4 +2,5 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-export const { APP_PORT, STATEMENT_PATH, STOCK_DB_PATH } = process.env
+export const { APP_PORT, STATEMENT_PATH, STOCK_DB_PATH, PATH_TO_PUBLIC } =
+    process.env

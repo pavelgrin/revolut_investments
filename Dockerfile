@@ -4,5 +4,5 @@ ARG WORK_DIR
 WORKDIR ${WORK_DIR}
 COPY . .
 RUN npm install && npm run build
-# CMD ["node", "build/main.js"]
+# CMD ["node", "app/main.js"]
 CMD ["npm", "run", "watch"]

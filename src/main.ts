@@ -1,7 +1,7 @@
 import path from "path"
 import express from "express"
 
-import { APP_PORT, STATEMENT_PATH, STOCK_DB_PATH } from "./env"
+import { APP_PORT, STATEMENT_PATH, STOCK_DB_PATH, PATH_TO_PUBLIC } from "./env"
 
 import { RequestFilter } from "./services/types"
 import { parseStatement } from "./services/parse"
@@ -15,6 +15,9 @@ const PORT = APP_PORT || 3000
 const statementPath = path.resolve(STATEMENT_PATH || "")
 const app = express()
 
+app.set("view engine", "ejs")
+app.use(express.static(PATH_TO_PUBLIC || ""))
+
 const stockDB = new DataBase(STOCK_DB_PATH || "")
 
 app.get("/", async (req, res) => {
@@ -22,10 +25,11 @@ app.get("/", async (req, res) => {
 
     const statement = await parseStatement(statementPath)
     const report = handleStatement(statement, { from, to, symbol, currency })
-    res.json(report)
+
+    res.render("index", { report })
 })
 
-app.get("/update", (_, res) => {
+app.post("/update", (_, res) => {
     res.json({
         isSuccessful: true,
     })

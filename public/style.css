@@ -1,0 +1,54 @@
+html {
+    width: 100%;
+    height: 100%;
+    font-size: 1px;
+}
+
+body {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    margin: 50rem 30rem;
+    font-size: 14rem;
+    font-family: "sans-serif";
+}
+
+div {
+    box-sizing: border-box;
+}
+
+.content {
+    width: 100%;
+    height: 100%;
+    max-width: 800rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.title {
+    font-size: 22rem;
+    font-weight: 700;
+}
+
+.generationDate {
+    font-size: 10rem;
+}
+
+.summary {
+    display: flex;
+    margin: 10rem 0;
+}
+
+.summaryLabelWrapper {
+    min-width: 150rem;
+    font-weight: 700;
+}
