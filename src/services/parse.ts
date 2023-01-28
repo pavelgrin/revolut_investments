@@ -2,7 +2,7 @@ import { createReadStream, PathLike } from "fs"
 import { parse } from "csv-parse"
 
 import { Transaction } from "./types"
-import { getISODate, getTimestampByDate, parseNumber } from "../utils"
+import { getDateTime, getTimestampByDate, parseNumber } from "../utils"
 
 export async function parseStatement(filePath: PathLike) {
     const promise = (): Promise<Transaction[]> =>
@@ -15,7 +15,7 @@ export async function parseStatement(filePath: PathLike) {
                     const timestamp = getTimestampByDate(csvRow[0])
 
                     const transaction: Transaction = {
-                        date: getISODate(csvRow[0]),
+                        date: getDateTime(csvRow[0]),
                         timestamp,
                         ticker: csvRow[1] || null,
                         type: csvRow[2],

@@ -62,6 +62,10 @@ table {
 th, td {
     border: 1rem solid #000;
     padding: 2rem 10rem;
+    text-align: center;
+}
+
+.date {
     text-align: left;
 }
 
@@ -71,4 +75,8 @@ th {
     left: 0;
     background-color: #fff;
     background-clip: padding-box;
+}
+
+.secondRowHeader {
+    top: 24rem;
 }

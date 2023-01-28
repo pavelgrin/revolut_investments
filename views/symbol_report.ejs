@@ -18,36 +18,34 @@
                 <div class="summaryValueWrapper">
                     <div>2022-01-01 - 2022-12-31 (fake)</div>
                     <div><%= report.currency %></div>
-                    <div><%= report.dividends %></div>
+                    <div>net: <%= report.dividends %></div>
                     <div><%= report.summary.buy %></div>
                     <div><%= report.summary.sell %></div>
                     <div><%= report.summary.netAmont %></div>
                     <div><%= report.summary.quantity.toFixed(8) %></div>
                     <div><%= report.summary.bep %></div>
-                    <div><%= report.pnlTotal %></div>
+                    <div>LIFO: <%= report.pnlTotal %></div>
                 </div>
             </div>
         </div>
         <div class="generationDate">Generated on the 2023-01-28 (fake)</div>
     </div>
-    <div id="fifo">
-        <table>
+    <table>
+        <tr>
+            <th class="date">Date</th>
+            <th>Quantity</th>
+            <th>Cost Basis</th>
+            <th>Gross Proceeds</th>
+            <th>PnL</th>
+        </tr>
+        <% report.sellsSummary.forEach((item)=> { %>
             <tr>
-                <th>Date</th>
-                <th>Quantity</th>
-                <th>Cost Basis</th>
-                <th>Gross Proceeds</th>
-                <th>PnL</th>
+                <td class="date"><%= item.date %></td>
+                <td><%= item.quantity.toFixed(8) %></td>
+                <td><%= item.costBasis %></td>
+                <td><%= item.grossProceeds %></td>
+                <td><%= item.pnl %></td>
             </tr>
-            <% report.sellsSummary.forEach((item)=> { %>
-                <tr>
-                    <td><%= item.date %></td>
-                    <td><%= item.quantity.toFixed(8) %></td>
-                    <td><%= item.costBasis %></td>
-                    <td><%= item.grossProceeds %></td>
-                    <td><%= item.pnl %></td>
-                </tr>
-            <% }) %>
-        </table>
-    </div>
+        <% }) %>
+    </table>
 </div>
