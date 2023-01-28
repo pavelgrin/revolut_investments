@@ -7,13 +7,80 @@
                 <div class="summaryLabelWrapper">
                     <div>Period</div>
                     <div>Currency</div>
+                    <div>Balance</div>
+                    <div>Dividends</div>
+                    <div>Custody Fee</div>
+                    <div>Total (by sells)</div>
                 </div>
                 <div class="summaryValueWrapper">
-                    <div>2022-01-01 - 2022-12-31</div>
-                    <div>USD</div>
+                    <div>2022-01-01 - 2022-12-31 (fake)</div>
+                    <div><%= report.currency %></div>
+                    <div><%= report.balance %></div>
+                    <div>
+                        gross: <%= report.dividends.withTax %> /
+                        net: <%= report.dividends.amount %> /
+                        tax: <%= report.dividends.tax %>
+                    </div>
+                    <div><%= report.custodyFee %></div>
+                    <div>
+                        FIFO: <%= report.totalFIFO %> /
+                        LIFO: <%= report.totalLIFO %>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="generationDate">Generated on the 2023-01-28</div>
+        <div class="generationDate">Generated on the 2023-01-28 (fake)</div>
+    </div>
+    <div class="tab">
+        <a href="#fifo">FIFO</a>
+        <a href="#lifo">LIFO</a>
+    </div>
+    <div id="fifo">
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Symbol</th>
+                <th>Quantity</th>
+                <th>Cost Basis</th>
+                <th>Gross Proceeds</th>
+                <th>PnL</th>
+            </tr>
+            <% report.summaryFIFO.forEach((item)=> { %>
+                <tr>
+                    <td><%= item.date %></td>
+                    <td>
+                        <a href="?symbol=<%= item.symbol %>"><%= item.symbol %></a>
+                    </td>
+                    <td><%= item.quantity.toFixed(8) %></td>
+                    <td><%= item.costBasis %></td>
+                    <td><%= item.grossProceeds %></td>
+                    <td><%= item.pnl %></td>
+                </tr>
+            <% }) %>
+        </table>
+    </div>
+    <div id="lifo">
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Symbol</th>
+                <th>Quantity</th>
+                <th>Cost Basis</th>
+                <th>Gross Proceeds</th>
+                <th>PnL</th>
+            </tr>
+            <% report.summaryLIFO.forEach((item)=> { %>
+                <tr>
+                    <td><%= item.date %></td>
+                    <td>
+                        <a href="?symbol=<%= item.symbol %>"><%= item.symbol %></a>
+                    </td>
+                    <td><%= item.quantity.toFixed(8) %></td>
+                    <td><%= item.costBasis %></td>
+                    <td><%= item.grossProceeds %></td>
+                    <td><%= item.pnl %></td>
+                </tr>
+            <% }) %>
+        </table>
     </div>
 </div>

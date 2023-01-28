@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+-   Report layout
 -   EJS templating
 -   SQLite database engine
 -   Docker-compose file
