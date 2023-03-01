@@ -6,17 +6,35 @@ import {
     Filter,
     TransactionDateType,
 } from "./types"
-import { roundAmount, getTimestampByDate } from "../utils"
+import { roundAmount, getDate, getTimestampByDate } from "../utils"
 
 export function getTransactionDate(
     type: TransactionDateType,
     statement: Transaction[]
 ) {
-    if (type === TransactionDateType.First) {
-        return "2021-01-01"
+    if (!statement.length) {
+        return getDate(new Date().toISOString())
     }
 
-    return "2023-12-31"
+    const transaction = statement.reduce(
+        (desiredTransaction: Transaction, currentTransaction: Transaction) => {
+            const { timestamp: desiredTimestamp } = desiredTransaction
+            const { timestamp: currentTimestamp } = currentTransaction
+
+            if (type === TransactionDateType.First) {
+                return currentTimestamp < desiredTimestamp
+                    ? currentTransaction
+                    : desiredTransaction
+            }
+
+            return currentTimestamp > desiredTimestamp
+                ? currentTransaction
+                : desiredTransaction
+        },
+        statement[0]
+    )
+
+    return getDate(transaction.isoDate)
 }
 
 export function applyFilter(

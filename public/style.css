@@ -31,9 +31,17 @@ div {
 }
 
 .responseWrapper {
+    position: relative;
     height: 18rem;
     margin-top: 10rem;
     font-weight: 700;
+}
+
+.response {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
 }
 
 .response__ok {

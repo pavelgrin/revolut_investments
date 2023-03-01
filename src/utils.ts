@@ -1,21 +1,21 @@
-type ISOStringFormat = string
+import { ISODateFormat } from "./services/types"
 
-export function getDate(dateTime: ISOStringFormat) {
+export function getDate(dateTime: ISODateFormat) {
     const [date] = dateTime.split("T")
     return date
 }
 
-export function getTime(dateTime: ISOStringFormat) {
+export function getTime(dateTime: ISODateFormat) {
     const [, time] = dateTime.split("T")
     return time.substring(0, 8)
 }
 
-export function getDateTime(dateTime: ISOStringFormat) {
+export function getDateTime(dateTime: ISODateFormat) {
     return `${getDate(dateTime)} ${getTime(dateTime)}`
 }
 
-export function getTimestampByDate(dateTime: ISOStringFormat) {
-    return Number(new Date(dateTime))
+export function getTimestampByDate(dateTime: ISODateFormat) {
+    return Date.parse(dateTime)
 }
 
 export function roundAmount(number: number) {

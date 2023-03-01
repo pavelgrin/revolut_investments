@@ -9,15 +9,18 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <% if (report.symbol) { %>
-        <%- include('./symbol_report', { report }) %>
-    <% } else { %>
-        <%- include('./common_report', { report }) %>
-    <% } %>
+    <div class="content">
+        <%- include('./update_report', { report }) %>
+        <% if (report.symbol) { %>
+            <%- include('./symbol_report', { report }) %>
+        <% } else { %>
+            <%- include('./common_report', { report }) %>
+        <% } %>
+    </div>
     <script>
-        const CURRENCY = "<%- report.currency %>"
-        const DATE_FROM = "<%- report.from %>"
-        const DATE_TO = "<%- report.to %>"
+        const __CURRENCY__ = "<%- report.currency %>"
+        const __DATE_FROM__ = "<%- report.from %>"
+        const __DATE_TO__ = "<%- report.to %>"
     </script>
     <script src="script.js"></script>
 </body>

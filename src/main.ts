@@ -1,11 +1,11 @@
-import path from "path"
 import express from "express"
+import multer from "multer"
 
-import { APP_PORT, STATEMENT_PATH, STOCK_DB_PATH, PATH_TO_PUBLIC } from "./env"
+import { APP_PORT, STOCK_DB_PATH, PATH_TO_PUBLIC } from "./env"
 
 import { getDate } from "./utils"
 
-import { UrlQuery } from "./services/types"
+import { QueryParams } from "./services/types"
 import { parseStatement } from "./services/parse"
 import { handleStatement } from "./services/handle"
 
@@ -14,7 +14,6 @@ import { Migration } from "./models/migration"
 
 const PORT = APP_PORT || 3000
 
-const statementPath = path.resolve(STATEMENT_PATH || "")
 const app = express()
 
 app.set("view engine", "ejs")
@@ -22,10 +21,13 @@ app.use(express.static(PATH_TO_PUBLIC || ""))
 
 const stockDB = new DataBase(STOCK_DB_PATH || "")
 
-app.get("/", async (req, res) => {
-    const { from, to, symbol, currency } = req.query as UrlQuery
+// TODO: Save data to DB
+let fileBuffer: Buffer | null = null
 
-    const statement = await parseStatement(statementPath)
+app.get("/", async (req, res) => {
+    const { from, to, symbol, currency } = req.query as QueryParams
+
+    const statement = await parseStatement(fileBuffer)
     const report = handleStatement(statement, { from, to, symbol, currency })
 
     res.render("index", {
@@ -34,10 +36,15 @@ app.get("/", async (req, res) => {
     })
 })
 
-app.post("/update", (_, res) => {
-    res.json({
-        isSuccessful: true,
-    })
+app.post("/update", multer().single("statement"), (req, res) => {
+    fileBuffer = req.file?.buffer || null
+
+    if (!fileBuffer) {
+        res.sendStatus(400)
+        return
+    }
+
+    res.sendStatus(200)
 })
 
 app.get("/**", (_, res) => {

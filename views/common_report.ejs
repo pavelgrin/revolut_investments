@@ -1,98 +1,87 @@
-<div class="content">
-    <%- include('./update_report', { report }) %>
-    <div class="header">
-        <div class="info">
-            <div class="title">Profit and Loss Statement</div>
-            <div class="summary">
-                <div class="summaryRow">
-                    <div class="summaryLabel">Period</div>
-                    <div class="summaryValue">
-                        <input
-                            type="date"
-                            name="from"
-                            id=""
-                            value="2022-01-01"
-                            required
-                        >
-                        <span>-</span>
-                        <input
-                            type="date"
-                            name="to"
-                            id=""
-                            value="2022-12-31"
-                            required
-                        >
-                        <button>update</button>
-                    </div>
+<div class="header">
+    <div class="info">
+        <div class="title">Profit and Loss Statement</div>
+        <div class="summary">
+            <div class="summaryRow">
+                <div class="summaryLabel">Period</div>
+                <div class="summaryValue">
+                    <input
+                        type="date"
+                        id="dateFromInput"
+                        required
+                    >
+                    <span>-</span>
+                    <input
+                        type="date"
+                        id="dateToInput"
+                        required
+                    >
+                    <button id="dateUpdateButton">update</button>
                 </div>
-                <div class="summaryRow">
-                    <div class="summaryLabel">Currency</div>
-                    <div class="summaryValue">
-                        <select
-                            name="currency"
-                            id=""
-                        >
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                        </select>
-                        <%= report.currency %>
-                    </div>
+            </div>
+            <div class="summaryRow">
+                <div class="summaryLabel">Currency</div>
+                <div class="summaryValue">
+                    <select id="currencySelect">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                    </select>
                 </div>
-                <div class="summaryRow">
-                    <div class="summaryLabel">Balance</div>
-                    <div class="summaryValue"><%= report.balance %></div>
+            </div>
+            <div class="summaryRow">
+                <div class="summaryLabel">Balance</div>
+                <div class="summaryValue"><%= report.balance %></div>
+            </div>
+            <div class="summaryRow">
+                <div class="summaryLabel">Dividends</div>
+                <div class="summaryValue">
+                    gross: <%= report.dividends.withTax %> /
+                    net: <%= report.dividends.amount %> /
+                    tax: <%= report.dividends.tax %>
                 </div>
-                <div class="summaryRow">
-                    <div class="summaryLabel">Dividends</div>
-                    <div class="summaryValue">
-                        gross: <%= report.dividends.withTax %> /
-                        net: <%= report.dividends.amount %> /
-                        tax: <%= report.dividends.tax %>
-                    </div>
-                </div>
-                <div class="summaryRow">
-                    <div class="summaryLabel">Custody Fee</div>
-                    <div class="summaryValue"><%= report.custodyFee %></div>
-                </div>
-                <div class="summaryRow">
-                    <div class="summaryLabel">Total (by sells)</div>
-                    <div class="summaryValue">
-                        FIFO: <%= report.totalFIFO %> /
-                        LIFO: <%= report.totalLIFO %>
-                    </div>
+            </div>
+            <div class="summaryRow">
+                <div class="summaryLabel">Custody Fee</div>
+                <div class="summaryValue"><%= report.custodyFee %></div>
+            </div>
+            <div class="summaryRow">
+                <div class="summaryLabel">Total (by sells)</div>
+                <div class="summaryValue">
+                    FIFO: <%= report.totalFIFO %> /
+                    LIFO: <%= report.totalLIFO %>
                 </div>
             </div>
         </div>
-        <div class="generationDate">Generated on the <%= generationDate  %></div>
     </div>
-    <table>
-        <tr>
-            <th rowspan="2" class="date">Date</th>
-            <th rowspan="2">Symbol</th>
-            <th rowspan="2">Quantity</th>
-            <th colspan="2">Cost Basis</th>
-            <th rowspan="2">Gross Proceeds</th>
-            <th colspan="2">PnL</th>
-        </tr>
-        <tr>
-            <th class="secondRowHeader">FIFO</th>
-            <th class="secondRowHeader">LIFO</th>
-            <th class="secondRowHeader">FIFO</th>
-            <th class="secondRowHeader">LIFO</th>
-        </tr>
-        <% report.summaryFIFO.forEach((item, index)=> { %>
-            <tr>
-                <td class="date"><%= item.date %></td>
-                <td>
-                    <a href="?symbol=<%= item.symbol %>"><%= item.symbol %></a>
-                </td>
-                <td><%= item.quantity.toFixed(8) %></td>
-                <td><%= item.costBasis %></td>
-                <td><%= report.summaryLIFO[index].costBasis %></td>
-                <td><%= item.grossProceeds %></td>
-                <td><%= item.pnl %></td>
-                <td><%= report.summaryLIFO[index].pnl %></td>
-            </tr>
-        <% }) %>
-    </table>
+    <div class="generationDate">Generated on the <%= generationDate  %></div>
 </div>
+<table>
+    <tr>
+        <th rowspan="2" class="date">Date</th>
+        <th rowspan="2">Symbol</th>
+        <th rowspan="2">Quantity</th>
+        <th colspan="2">Cost Basis</th>
+        <th rowspan="2">Gross Proceeds</th>
+        <th colspan="2">PnL</th>
+    </tr>
+    <tr>
+        <th class="secondRowHeader">FIFO</th>
+        <th class="secondRowHeader">LIFO</th>
+        <th class="secondRowHeader">FIFO</th>
+        <th class="secondRowHeader">LIFO</th>
+    </tr>
+    <% report.summaryFIFO.forEach((item, index)=> { %>
+        <tr>
+            <td class="date"><%= item.date %></td>
+            <td>
+                <a symbol="<%= item.symbol %>"><%= item.symbol %></a>
+            </td>
+            <td><%= item.quantity.toFixed(8) %></td>
+            <td><%= item.costBasis %></td>
+            <td><%= report.summaryLIFO[index].costBasis %></td>
+            <td><%= item.grossProceeds %></td>
+            <td><%= item.pnl %></td>
+            <td><%= report.summaryLIFO[index].pnl %></td>
+        </tr>
+    <% }) %>
+</table>

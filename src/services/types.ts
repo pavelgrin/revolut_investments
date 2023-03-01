@@ -20,6 +20,7 @@ export enum TransactionDateType {
 }
 
 export type Date = string
+export type ISODateFormat = string
 export type DateTime = string
 export type Timestamp = number
 export type Ticker = string
@@ -29,6 +30,7 @@ export type Amount = number
 export type FX_Rate = number
 
 export type Transaction = {
+    isoDate: ISODateFormat
     date: DateTime
     timestamp: Timestamp
     ticker: Ticker | null
@@ -51,7 +53,7 @@ export type SummaryItem = {
     pnl: Amount
 }
 
-export type UrlQuery = {
+export type QueryParams = {
     from: Date | null
     to: Date | null
     symbol: Ticker | null

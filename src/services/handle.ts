@@ -1,14 +1,14 @@
 import {
     Type,
     Currency,
-    Ticker,
     Transaction,
     SummaryItem,
-    UrlQuery,
+    QueryParams,
     Filter,
     GroupedTypes,
     TransactionDateType,
 } from "./types"
+
 import { roundAmount } from "../utils"
 
 import {
@@ -18,6 +18,7 @@ import {
     copyTransactions,
     handleStockSplit,
 } from "./prepare_data"
+
 import { getBalance, getDividends, getCustodyFee } from "./calc_total"
 import { getSellsSummary } from "./calc_sells_summary"
 import { getTickerSummary } from "./calc_ticker_summary"
@@ -83,16 +84,16 @@ function getTickerReport(transactionByType: GroupedTypes) {
     }
 }
 
-export function handleStatement(statement: Transaction[], query: UrlQuery) {
+export function handleStatement(statement: Transaction[], params: QueryParams) {
     const filter: Filter = {
         from:
-            query.from ||
+            params.from ||
             getTransactionDate(TransactionDateType.First, statement),
         to:
-            query.to ||
+            params.to ||
             getTransactionDate(TransactionDateType.Latest, statement),
-        symbol: query.symbol || null,
-        currency: query.currency || Currency.USD,
+        symbol: params.symbol || null,
+        currency: params.currency || Currency.USD,
     }
 
     const filteredTransactions = applyFilter(statement, filter)
