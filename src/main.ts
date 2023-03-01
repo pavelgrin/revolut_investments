@@ -3,7 +3,9 @@ import express from "express"
 
 import { APP_PORT, STATEMENT_PATH, STOCK_DB_PATH, PATH_TO_PUBLIC } from "./env"
 
-import { RequestFilter } from "./services/types"
+import { getDate } from "./utils"
+
+import { UrlQuery } from "./services/types"
 import { parseStatement } from "./services/parse"
 import { handleStatement } from "./services/handle"
 
@@ -21,12 +23,15 @@ app.use(express.static(PATH_TO_PUBLIC || ""))
 const stockDB = new DataBase(STOCK_DB_PATH || "")
 
 app.get("/", async (req, res) => {
-    const { from, to, symbol, currency } = req.query as RequestFilter
+    const { from, to, symbol, currency } = req.query as UrlQuery
 
     const statement = await parseStatement(statementPath)
     const report = handleStatement(statement, { from, to, symbol, currency })
 
-    res.render("index", { report })
+    res.render("index", {
+        report,
+        generationDate: getDate(new Date().toISOString()),
+    })
 })
 
 app.post("/update", (_, res) => {

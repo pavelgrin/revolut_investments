@@ -3,27 +3,33 @@ import {
     Currency,
     Transaction,
     GroupedTypes,
-    GroupedTickers,
-    RequestFilter,
+    Filter,
+    TransactionDateType,
 } from "./types"
 import { roundAmount, getTimestampByDate } from "../utils"
 
+export function getTransactionDate(
+    type: TransactionDateType,
+    statement: Transaction[]
+) {
+    if (type === TransactionDateType.First) {
+        return "2021-01-01"
+    }
+
+    return "2023-12-31"
+}
+
 export function applyFilter(
     statement: Transaction[],
-    { from, to, symbol, currency }: RequestFilter
+    { from, to, symbol, currency }: Filter
 ) {
-    const fromTimestamp = from && getTimestampByDate(from)
-    const toTimestamp = to && getTimestampByDate(to)
+    const fromTimestamp = getTimestampByDate(from)
+    const toTimestamp = getTimestampByDate(to)
 
     return statement
         .filter(({ timestamp, type, ticker }) => {
-            const isFrom = fromTimestamp
-                ? timestamp >= fromTimestamp || type === Type.Buy
-                : true
-
-            const isTo = toTimestamp
-                ? timestamp <= toTimestamp || type === Type.Buy
-                : true
+            const isFrom = timestamp >= fromTimestamp || type === Type.Buy
+            const isTo = timestamp <= toTimestamp || type === Type.Buy
 
             const isSymbol = symbol ? symbol === ticker : true
 
@@ -66,26 +72,6 @@ export function groupByType(statement: Transaction[]) {
         groupedTypes[transaction.type].push(transaction)
         return groupedTypes
     }, groupedTypes)
-}
-
-export function groupByTicker(statement: Transaction[]) {
-    const groupedTickers: GroupedTickers = {}
-
-    return statement.reduce((groupedTickers, transaction: Transaction) => {
-        if (transaction.ticker) {
-            if (!groupedTickers[transaction.ticker]) {
-                groupedTickers[transaction.ticker] = 0
-            }
-
-            if (transaction.type === Type.Buy) {
-                groupedTickers[transaction.ticker] += transaction.quantity || 0
-            } else if (transaction.type === Type.Sell) {
-                groupedTickers[transaction.ticker] -= transaction.quantity || 0
-            }
-        }
-
-        return groupedTickers
-    }, groupedTickers)
 }
 
 export function getTotalAmount(transactions: Transaction[]) {
@@ -131,9 +117,6 @@ export function handleStockSplit(transactionByType: GroupedTypes) {
         )
 
         const quantitySum = buyQuantitySum - sellQuantitySum
-        // const splitRatio = Math.round(
-        //     (splitQuantity + quantitySum) / quantitySum
-        // )
 
         // Mutate buy deals to update quantity and price after split
         buyDeals.forEach((transaction) => {

@@ -12,6 +12,7 @@ body {
     margin: 0;
     padding: 0;
     font-size: 14rem;
+    line-height: 1.25;
     font-family: "sans-serif";
 }
 
@@ -23,6 +24,24 @@ div {
     width: 100%;
     max-width: 800rem;
     margin: 50rem 30rem;
+}
+
+.statementUploading {
+    margin-bottom: 50rem;
+}
+
+.responseWrapper {
+    height: 18rem;
+    margin-top: 10rem;
+    font-weight: 700;
+}
+
+.response__ok {
+    color: rgb(0, 150, 0);
+}
+
+.response__error {
+    color: rgb(150, 0, 0);
 }
 
 .header {
@@ -41,21 +60,26 @@ div {
 }
 
 .summary {
-    display: flex;
-    margin: 10rem 0;
+    margin-top: 10rem;
 }
 
-.summaryLabelWrapper {
+.summaryRow {
+    display: flex;
+    align-items: center;
+}
+
+.summaryRow + .summaryRow {
+    margin-top: 5rem;
+}
+
+.summaryLabel {
     min-width: 160rem;
     font-weight: 700;
 }
 
-.tab {
-    margin: 10rem 0;
-}
-
 table {
     width: 100%;
+    margin-top: 20rem;
     border-collapse: collapse;
 }
 

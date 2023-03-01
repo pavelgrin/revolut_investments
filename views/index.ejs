@@ -13,6 +13,12 @@
         <%- include('./symbol_report', { report }) %>
     <% } else { %>
         <%- include('./common_report', { report }) %>
-    <% } %>    
+    <% } %>
+    <script>
+        const CURRENCY = "<%- report.currency %>"
+        const DATE_FROM = "<%- report.from %>"
+        const DATE_TO = "<%- report.to %>"
+    </script>
+    <script src="script.js"></script>
 </body>
 </html>

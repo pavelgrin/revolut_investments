@@ -14,7 +14,13 @@ export enum Currency {
     EUR = "EUR",
 }
 
+export enum TransactionDateType {
+    First,
+    Latest,
+}
+
 export type Date = string
+export type DateTime = string
 export type Timestamp = number
 export type Ticker = string
 export type Quantity = number
@@ -23,7 +29,7 @@ export type Amount = number
 export type FX_Rate = number
 
 export type Transaction = {
-    date: Date
+    date: DateTime
     timestamp: Timestamp
     ticker: Ticker | null
     type: Type
@@ -35,10 +41,9 @@ export type Transaction = {
 }
 
 export type GroupedTypes = Record<Type, Transaction[]>
-export type GroupedTickers = Record<Ticker, Quantity>
 
 export type SummaryItem = {
-    date: Date
+    date: DateTime
     symbol: Ticker
     quantity: Quantity
     costBasis: Amount
@@ -46,9 +51,16 @@ export type SummaryItem = {
     pnl: Amount
 }
 
-export type RequestFilter = {
-    from: string | null
-    to: string | null
-    symbol: string | null
+export type UrlQuery = {
+    from: Date | null
+    to: Date | null
+    symbol: Ticker | null
     currency: Currency | null
+}
+
+export type Filter = {
+    from: Date
+    to: Date
+    symbol: Ticker | null
+    currency: Currency
 }

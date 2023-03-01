@@ -4,16 +4,17 @@ import {
     Ticker,
     Transaction,
     SummaryItem,
-    RequestFilter,
+    UrlQuery,
+    Filter,
     GroupedTypes,
-    // GroupedTickers,
+    TransactionDateType,
 } from "./types"
 import { roundAmount } from "../utils"
 
 import {
+    getTransactionDate,
     applyFilter,
     groupByType,
-    // groupByTicker,
     copyTransactions,
     handleStockSplit,
 } from "./prepare_data"
@@ -21,11 +22,7 @@ import { getBalance, getDividends, getCustodyFee } from "./calc_total"
 import { getSellsSummary } from "./calc_sells_summary"
 import { getTickerSummary } from "./calc_ticker_summary"
 
-function getCommonReport(
-    transactionByType: GroupedTypes,
-    // activeTickers: [string, number][],
-    currency: Currency
-) {
+function getCommonReport(transactionByType: GroupedTypes) {
     const balance = getBalance(
         transactionByType[Type.TopUp],
         transactionByType[Type.Withdraw]
@@ -53,8 +50,6 @@ function getCommonReport(
     }, 0)
 
     return {
-        currency,
-        // activeTickers,
         balance,
         dividends,
         custodyFee,
@@ -65,11 +60,7 @@ function getCommonReport(
     }
 }
 
-function getTickerReport(
-    transactionByType: GroupedTypes,
-    currency: Currency,
-    symbol: Ticker
-) {
+function getTickerReport(transactionByType: GroupedTypes) {
     const dividends = getDividends(transactionByType[Type.Dividend])
     const summary = getTickerSummary(
         copyTransactions(transactionByType[Type.Buy]),
@@ -85,8 +76,6 @@ function getTickerReport(
     }, 0)
 
     return {
-        symbol,
-        currency,
         dividends: dividends.amount,
         summary,
         pnlTotal,
@@ -94,27 +83,30 @@ function getTickerReport(
     }
 }
 
-export function handleStatement(
-    statement: Transaction[],
-    filter: RequestFilter
-) {
+export function handleStatement(statement: Transaction[], query: UrlQuery) {
+    const filter: Filter = {
+        from:
+            query.from ||
+            getTransactionDate(TransactionDateType.First, statement),
+        to:
+            query.to ||
+            getTransactionDate(TransactionDateType.Latest, statement),
+        symbol: query.symbol || null,
+        currency: query.currency || Currency.USD,
+    }
+
     const filteredTransactions = applyFilter(statement, filter)
     const transactionByType = handleStockSplit(
         groupByType(filteredTransactions)
     )
-    // const transactionByTicker = groupByTicker(filteredTransactions)
 
-    const currency = filter.currency || Currency.USD
-
-    // const activeTickers = Object.entries(transactionByTicker).filter(
-    //     ([_, quantity]) => {
-    //         return Boolean(quantity)
-    //     }
-    // )
-
-    if (filter.symbol) {
-        return getTickerReport(transactionByType, currency, filter.symbol)
+    return {
+        from: filter.from,
+        to: filter.to,
+        symbol: filter.symbol,
+        currency: filter.currency,
+        ...(filter.symbol
+            ? getTickerReport(transactionByType)
+            : getCommonReport(transactionByType)),
     }
-
-    return getCommonReport(transactionByType, /*activeTickers,*/ currency)
 }

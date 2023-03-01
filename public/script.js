@@ -1,0 +1,1 @@
+console.log(CURRENCY, DATE_FROM, DATE_TO);

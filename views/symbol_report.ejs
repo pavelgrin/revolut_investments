@@ -1,34 +1,74 @@
 <div class="content">
+    <%- include('./update_report', { report }) %>
     <div class="header">
         <div class="info">
             <div class="title">Profit and Loss Statement (<%= report.symbol %>)</div>
-            
             <div class="summary">
-                <div class="summaryLabelWrapper">
-                    <div>Period</div>
-                    <div>Currency</div>
-                    <div>Dividends</div>
-                    <div>Buy amount</div>
-                    <div>Sell amount</div>
-                    <div>Net amount</div>
-                    <div>Quantity</div>
-                    <div>Break-Even Point</div>
-                    <div>Profit and Loss</div>
+                <div class="summaryRow">
+                    <div class="summaryLabel">Period</div>
+                    <div class="summaryValue">
+                        <input
+                            type="date"
+                            name="from"
+                            id=""
+                            value="2022-01-01"
+                            required
+                        >
+                        <span>-</span>
+                        <input
+                            type="date"
+                            name="to"
+                            id=""
+                            value="2022-12-31"
+                            required
+                        >
+                        <button>update</button>
+                    </div>
                 </div>
-                <div class="summaryValueWrapper">
-                    <div>2022-01-01 - 2022-12-31 (fake)</div>
-                    <div><%= report.currency %></div>
-                    <div>net: <%= report.dividends %></div>
-                    <div><%= report.summary.buy %></div>
-                    <div><%= report.summary.sell %></div>
-                    <div><%= report.summary.netAmont %></div>
-                    <div><%= report.summary.quantity.toFixed(8) %></div>
-                    <div><%= report.summary.bep %></div>
-                    <div>LIFO: <%= report.pnlTotal %></div>
+                <div class="summaryRow">
+                    <div class="summaryLabel">Currency</div>
+                    <div class="summaryValue">
+                        <select
+                            name="currency"
+                            id=""
+                        >
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                        <%= report.currency %>
+                    </div>
+                </div>
+                <div class="summaryRow">
+                    <div class="summaryLabel">Dividends</div>
+                    <div class="summaryValue">net: <%= report.dividends %></div>
+                </div>
+                <div class="summaryRow">
+                    <div class="summaryLabel">Buy amount</div>
+                    <div class="summaryValue"><%= report.summary.buy %></div>
+                </div>
+                <div class="summaryRow">
+                    <div class="summaryLabel">Sell amount</div>
+                    <div class="summaryValue"><%= report.summary.sell %></div>
+                </div>
+                <div class="summaryRow">
+                    <div class="summaryLabel">Net amount</div>
+                    <div class="summaryValue"><%= report.summary.netAmont %></div>
+                </div>
+                <div class="summaryRow">
+                    <div class="summaryLabel">Quantity</div>
+                    <div class="summaryValue"><%= report.summary.quantity.toFixed(8) %></div>
+                </div>
+                <div class="summaryRow">
+                    <div class="summaryLabel">Break-Even Point</div>
+                    <div class="summaryValue"><%= report.summary.bep %></div>
+                </div>
+                <div class="summaryRow">
+                    <div class="summaryLabel">Profit and Loss</div>
+                    <div class="summaryValue">LIFO: <%= report.pnlTotal %></div>
                 </div>
             </div>
         </div>
-        <div class="generationDate">Generated on the 2023-01-28 (fake)</div>
+        <div class="generationDate">Generated on the <%= generationDate  %></div>
     </div>
     <table>
         <tr>
