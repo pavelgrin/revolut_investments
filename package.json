@@ -1,6 +1,6 @@
 {
     "name": "revolut_investments",
-    "version": "0.15.0",
+    "version": "0.15.1",
     "description": "",
     "license": "MIT",
     "author": "Pavel Grinevich",
@@ -12,7 +12,7 @@
     "scripts": {
         "start": "npm run build && node app/main.js",
         "watch": "nodemon src/main.ts",
-        "build": "rm -rf build && tsc"
+        "build": "rm -rf app && tsc"
     },
     "devDependencies": {
         "@types/express": "4.17.13",

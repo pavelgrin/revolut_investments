@@ -8,6 +8,5 @@ services:
         ports:
             - "${APP_PORT}:${APP_PORT}"
         volumes:
-            - .:${WORK_DIR}:ro
             - ./resources:${WORK_DIR}/resources:rw
-        command: npm run build
+        command: npm run start

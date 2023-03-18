@@ -6,7 +6,8 @@ Calculation of the buy/sell shares results through the Revolut app. The output i
 
 ```
 # Dev mode (with change watching)
-docker-compose -f docker-compose.dev.yml up
+npm install
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 # Prod mode
 docker-compose up
