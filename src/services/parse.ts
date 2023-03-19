@@ -4,15 +4,10 @@ import { parse } from "csv-parse"
 import { Transaction } from "./types"
 import { getDateTime, getTimestampByDate, parseNumber } from "../utils"
 
-export async function parseStatement(fileBuffer: Buffer | null) {
+export async function parseStatement(fileBuffer: Buffer) {
     const promise = (): Promise<Transaction[]> =>
         new Promise((resolve, reject) => {
             const statement: Transaction[] = []
-
-            if (!fileBuffer) {
-                resolve(statement)
-                return
-            }
 
             Readable.from(fileBuffer)
                 .pipe(parse({ delimiter: ",", from_line: 2 }))
@@ -39,8 +34,8 @@ export async function parseStatement(fileBuffer: Buffer | null) {
                 .on("end", () => {
                     resolve(statement)
                 })
-                .on("error", (err) => {
-                    reject(err)
+                .on("error", (error) => {
+                    reject(error)
                 })
         })
 

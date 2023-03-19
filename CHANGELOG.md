@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+-   Storing statement in the database
 -   Dev mode for docker-compose
 -   Statement uploading
 -   Report layout

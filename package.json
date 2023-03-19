@@ -1,6 +1,6 @@
 {
     "name": "revolut_investments",
-    "version": "0.15.1",
+    "version": "1.0.0",
     "description": "",
     "license": "MIT",
     "author": "Pavel Grinevich",
@@ -12,7 +12,9 @@
     "scripts": {
         "start": "npm run build && node app/main.js",
         "watch": "nodemon src/main.ts",
-        "build": "rm -rf app && tsc"
+        "build": "rm -rf app && tsc",
+        "migration_up": "node app/models/migration.js up",
+        "migration_down": "node app/models/migration.js down"
     },
     "devDependencies": {
         "@types/express": "4.17.13",
